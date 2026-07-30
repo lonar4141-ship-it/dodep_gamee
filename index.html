@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рулетка & Сейф</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121216;
+    color: #ffffff;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+#balance-display {
+    font-size: 24px;
+    color: #2ecc71;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.main-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1100px;
+    width: 100%;
+}
+
+.wheel-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1e1e24;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #2d2d38;
+}
+
+.wheel-box {
+    position: relative;
+    width: 320px;
+    height: 320px;
+}
+
+.pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #e74c3c;
+    z-index: 10;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.spin-btn {
+    margin-top: 20px;
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #3498db;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+}
+
+.spin-btn:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.shop-section {
+    background: #1e1e24;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #2d2d38;
+    max-width: 380px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shop-section h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.shop-btn {
+    padding: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #27ae60;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.shop-btn:disabled {
+    background-color: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.safe-section {
+    background: #1e1e24;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #2d2d38;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+}
+
+.safe-box {
+    width: 240px;
+    height: 240px;
+    background-color: #34495e;
+    border: 6px solid #2c3e50;
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+.safe-door {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #7f8c8d;
+    border: 4px solid #95a5a6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    transition: transform 1s ease-in-out;
+    transform-origin: left;
+}
+
+.safe-handle {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #2c3e50;
+    border-radius: 50%;
+    background-color: #bdc3c7;
+    margin-top: 10px;
+}
+
+.safe-door.open {
+    transform: rotateY(-110deg);
+}
+
+#safe-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+</head>
+<body>
+
+<h1>Рулетка Удачи</h1>
+<div id="balance-display">Баланс: <span id="balance">0</span>$</div>
+
+<div class="main-container">
+
+    <div class="wheel-section">
+        <div class="wheel-box">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="320" height="320"></canvas>
+        </div>
+        <button class="spin-btn" id="spin-btn">Крутить колесо</button>
+    </div>
+
+    <div class="shop-section">
+        <h2>Магазин</h2>
+        <button class="shop-btn" id="buy-luck">Удача (+0.5%) - 4 000$</button>
+        <button class="shop-btn" id="buy-speed">Ускорить вращение - 3 000$</button>
+        <button class="shop-btn" id="buy-10k">Добавить 10 000$ - 10 000$</button>
+        <button class="shop-btn" id="buy-20k">Добавить 20 000$ - 20 000$</button>
+        <button class="shop-btn" id="buy-30k">Добавить 30 000$ - 30 000$</button>
+        <button class="shop-btn" id="buy-40k">Добавить 40 000$ - 40 000$</button>
+        <button class="shop-btn" id="buy-50k">Добавить 50 000$ - 50 000$</button>
+        <button class="shop-btn" id="buy-key" style="background-color: #e67e22;">Ключ от сейфа - 400 000$</button>
+    </div>
+
+    <div class="safe-section">
+        <h2>Сейф</h2>
+        <div class="safe-box">
+            <div class="safe-door" id="safe-door">
+                <div>🔒 СЕЙФ</div>
+                <div class="safe-handle"></div>
+            </div>
+            <video id="safe-video" src="InShot_20260724_005742302.mp4" playsinline></video>
+        </div>
+    </div>
+
+</div>
+
+<script>
+var balance = parseInt(localStorage.getItem('rick_balance')) || 0;
+var luckBoost = parseFloat(localStorage.getItem('rick_luck')) || 0;
+var spinDuration = parseInt(localStorage.getItem('rick_duration')) || 4000;
+var unlockedSectors = JSON.parse(localStorage.getItem('rick_sectors')) || [];
+var isKeyBought = localStorage.getItem('rick_key') === 'true';
+
+var baseSectors = [
+    { label: '100$', val: 100, weight: 100 },
+    { label: '300$', val: 300, weight: 70 },
+    { label: '500$', val: 500, weight: 50 },
+    { label: '700$', val: 700, weight: 35 },
+    { label: '1000$', val: 1000, weight: 20 },
+    { label: '2000$', val: 2000, weight: 10 },
+    { label: '3000$', val: 3000, weight: 5 },
+    { label: '5000$', val: 5000, weight: 2 }
+];
+
+var extraSectorsData = {
+    10000: { label: '10 000$', val: 10000, weight: 1.0 },
+    20000: { label: '20 000$', val: 20000, weight: 0.5 },
+    30000: { label: '30 000$', val: 30000, weight: 0.25 },
+    40000: { label: '40 000$', val: 40000, weight: 0.125 },
+    50000: { label: '50 000$', val: 50000, weight: 0.0625 }
+};
+
+var currentSectors = [];
+var canvas = document.getElementById('wheel');
+var ctx = canvas.getContext('2d');
+var isSpinning = false;
+var currentAngle = 0;
+
+function saveProgress() {
+    localStorage.setItem('rick_balance', balance);
+    localStorage.setItem('rick_luck', luckBoost);
+    localStorage.setItem('rick_duration', spinDuration);
+    localStorage.setItem('rick_sectors', JSON.stringify(unlockedSectors));
+    localStorage.setItem('rick_key', isKeyBought);
+}
+
+function updateSectorsList() {
+    currentSectors = baseSectors.slice();
+    for (var i = 0; i < unlockedSectors.length; i++) {
+        var key = unlockedSectors[i];
+        if (extraSectorsData[key]) {
+            currentSectors.push(extraSectorsData[key]);
+        }
+    }
+}
+
+function updateUI() {
+    document.getElementById('balance').innerText = balance;
+    
+    document.getElementById('buy-luck').disabled = balance < 4000;
+    document.getElementById('buy-speed').disabled = balance < 3000 || spinDuration <= 1000;
+    
+    document.getElementById('buy-10k').disabled = balance < 10000 || unlockedSectors.indexOf(10000) !== -1;
+    document.getElementById('buy-20k').disabled = balance < 20000 || unlockedSectors.indexOf(20000) !== -1;
+    document.getElementById('buy-30k').disabled = balance < 30000 || unlockedSectors.indexOf(30000) !== -1;
+    document.getElementById('buy-40k').disabled = balance < 40000 || unlockedSectors.indexOf(40000) !== -1;
+    document.getElementById('buy-50k').disabled = balance < 50000 || unlockedSectors.indexOf(50000) !== -1;
+    
+    document.getElementById('buy-key').disabled = balance < 400000 || isKeyBought;
+
+    if (isKeyBought) {
+        document.getElementById('safe-door').classList.add('open');
+    }
+}
+
+function drawWheel() {
+    var num = currentSectors.length;
+    var arc = (2 * Math.PI) / num;
+    var colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e84393'];
+
+    ctx.clearRect(0, 0, 320, 320);
+
+    for (var i = 0; i < num; i++) {
+        var angle = currentAngle + i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 150, angle, angle + arc);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 13px Arial";
+        ctx.fillText(currentSectors[i].label, 140, 5);
+        ctx.restore();
+    }
+}
+
+function getRandomSectorIndex() {
+    var totalWeight = 0;
+    var adjustedWeights = [];
+
+    for (var i = 0; i < currentSectors.length; i++) {
+        var w = currentSectors[i].weight;
+        if (w < 50) {
+            w = w * (1 + luckBoost);
+        }
+        adjustedWeights.push(w);
+        totalWeight += w;
+    }
+
+    var randomNum = Math.random() * totalWeight;
+    var weightSum = 0;
+
+    for (var j = 0; j < currentSectors.length; j++) {
+        weightSum += adjustedWeights[j];
+        if (randomNum <= weightSum) {
+            return j;
+        }
+    }
+    return 0;
+}
+
+function spin() {
+    if (isSpinning) return;
+    isSpinning = true;
+    document.getElementById('spin-btn').disabled = true;
+
+    var targetIndex = getRandomSectorIndex();
+    var num = currentSectors.length;
+    var arc = (2 * Math.PI) / num;
+
+    var targetAngleOnWheel = (3 * Math.PI / 2) - (targetIndex * arc + arc / 2);
+    targetAngleOnWheel = (targetAngleOnWheel % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+    var extraRounds = 5 * 2 * Math.PI;
+    var finalAngle = currentAngle + extraRounds + (targetAngleOnWheel - (currentAngle % (2 * Math.PI)));
+
+    var startTime = null;
+    var startAngle = currentAngle;
+
+    function animateSpin(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = (timestamp - startTime) / spinDuration;
+
+        if (progress < 1) {
+            var easeOut = 1 - Math.pow(1 - progress, 3);
+            currentAngle = startAngle + (finalAngle - startAngle) * easeOut;
+            drawWheel();
+            requestAnimationFrame(animateSpin);
+        } else {
+            currentAngle = finalAngle;
+            drawWheel();
+            isSpinning = false;
+            document.getElementById('spin-btn').disabled = false;
+
+            var wonAmount = currentSectors[targetIndex].val;
+            balance += wonAmount;
+            updateUI();
+            saveProgress();
+        }
+    }
+
+    requestAnimationFrame(animateSpin);
+}
+
+document.getElementById('spin-btn').addEventListener('click', spin);
+
+document.getElementById('buy-luck').addEventListener('click', function() {
+    if (balance >= 4000) {
+        balance -= 4000;
+        luckBoost += 0.5;
+        updateUI();
+        saveProgress();
+    }
+});
+
+document.getElementById('buy-speed').addEventListener('click', function() {
+    if (balance >= 3000 && spinDuration > 1000) {
+        balance -= 3000;
+        spinDuration = 1000;
+        updateUI();
+        saveProgress();
+    }
+});
+
+function setupExtraSectorButton(btnId, val, price) {
+    document.getElementById(btnId).addEventListener('click', function() {
+        if (balance >= price && unlockedSectors.indexOf(val) === -1) {
+            balance -= price;
+            unlockedSectors.push(val);
+            updateSectorsList();
+            drawWheel();
+            updateUI();
+            saveProgress();
+        }
+    });
+}
+
+setupExtraSectorButton('buy-10k', 10000, 10000);
+setupExtraSectorButton('buy-20k', 20000, 20000);
+setupExtraSectorButton('buy-30k', 30000, 30000);
+setupExtraSectorButton('buy-40k', 40000, 40000);
+setupExtraSectorButton('buy-50k', 50000, 50000);
+
+document.getElementById('buy-key').addEventListener('click', function() {
+    if (balance >= 400000 && !isKeyBought) {
+        balance -= 400000;
+        isKeyBought = true;
+        updateUI();
+        saveProgress();
+        
+        var video = document.getElementById('safe-video');
+        video.play();
+    }
+});
+
+updateSectorsList();
+drawWheel();
+updateUI();
+
+if (isKeyBought) {
+    var video = document.getElementById('safe-video');
+    video.play();
+}
+</script>
+</body>
+</html>
