@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Рулетка & Сейф</title>
+<title>Рулетка Удачи</title>
 <style>
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #121216;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at center, #1b1e2e, #0a0b12);
     color: #ffffff;
     margin: 0;
     padding: 20px;
@@ -19,18 +19,41 @@ body {
     flex-direction: column;
     align-items: center;
     user-select: none;
+    min-height: 100vh;
 }
 
 h1 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 32px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.stats-panel {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    font-size: 20px;
+    font-weight: bold;
 }
 
 #balance-display {
-    font-size: 24px;
     color: #2ecc71;
-    font-weight: bold;
-    margin-bottom: 20px;
+}
+
+#luck-display {
+    color: #f1c40f;
 }
 
 .main-container {
@@ -38,7 +61,7 @@ h1 {
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
-    max-width: 1100px;
+    max-width: 1200px;
     width: 100%;
 }
 
@@ -46,143 +69,197 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #1e1e24;
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid #2d2d38;
+    background: rgba(30, 30, 42, 0.6);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
 }
 
 .wheel-box {
     position: relative;
-    width: 320px;
-    height: 320px;
+    width: 340px;
+    height: 340px;
+    padding: 10px;
+    background: radial-gradient(circle, #2c3e50, #000000);
+    border-radius: 50%;
+    box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.2);
 }
 
 .pointer {
     position: absolute;
-    top: -10px;
+    top: -5px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 25px solid #e74c3c;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 30px solid #ff4757;
     z-index: 10;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+    transform-origin: 50% 0%;
+    transition: transform 0.05s ease;
 }
 
 canvas {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
 .spin-btn {
-    margin-top: 20px;
-    padding: 14px 28px;
+    margin-top: 25px;
+    padding: 16px 36px;
     font-size: 18px;
     font-weight: bold;
     color: #fff;
-    background-color: #3498db;
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    transition: all 0.2s ease;
+}
+
+.spin-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.6);
 }
 
 .spin-btn:disabled {
-    background-color: #555;
+    background: #444;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
 
 .shop-section {
-    background: #1e1e24;
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid #2d2d38;
+    background: rgba(30, 30, 42, 0.6);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
     max-width: 380px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .shop-section h2 {
     margin-top: 0;
     text-align: center;
+    font-size: 22px;
+    letter-spacing: 1px;
 }
 
 .shop-btn {
-    padding: 12px;
-    font-size: 13px;
-    font-weight: bold;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
     color: #fff;
-    background-color: #27ae60;
+    background: linear-gradient(135deg, #2ed573, #26af5f);
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
     text-align: left;
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.2);
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shop-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46, 213, 115, 0.4);
 }
 
 .shop-btn:disabled {
-    background-color: #444;
-    color: #888;
+    background: #333;
+    color: #666;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.shop-btn.key-btn {
+    background: linear-gradient(135deg, #ffa502, #ff7f50);
+    box-shadow: 0 4px 12px rgba(255, 165, 2, 0.3);
+}
+
+.shop-btn.key-btn:hover:not(:disabled) {
+    box-shadow: 0 6px 18px rgba(255, 165, 2, 0.5);
 }
 
 .safe-section {
-    background: #1e1e24;
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid #2d2d38;
+    background: rgba(30, 30, 42, 0.6);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 300px;
+    width: 320px;
+}
+
+.safe-section h2 {
+    margin-top: 0;
+    font-size: 22px;
+    letter-spacing: 1px;
 }
 
 .safe-box {
-    width: 240px;
-    height: 240px;
-    background-color: #34495e;
-    border: 6px solid #2c3e50;
-    border-radius: 12px;
+    width: 260px;
+    height: 260px;
+    background: #1e272e;
+    border: 8px solid #2f3640;
+    border-radius: 16px;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 10px 20px rgba(0,0,0,0.5);
+    perspective: 1000px;
 }
 
 .safe-door {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: #7f8c8d;
-    border: 4px solid #95a5a6;
+    background: linear-gradient(135deg, #718093, #485460);
+    border: 4px solid #a4b0be;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 5;
-    transition: transform 1s ease-in-out;
+    transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: left;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 2px;
 }
 
 .safe-handle {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #2c3e50;
+    width: 70px;
+    height: 70px;
+    border: 8px solid #2f3640;
     border-radius: 50%;
-    background-color: #bdc3c7;
-    margin-top: 10px;
+    background: radial-gradient(circle, #dcdde1, #718093);
+    margin-top: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .safe-door.open {
-    transform: rotateY(-110deg);
+    transform: rotateY(-115deg);
 }
 
 #safe-video {
@@ -195,13 +272,17 @@ canvas {
 <body>
 
 <h1>Рулетка Удачи</h1>
-<div id="balance-display">Баланс: <span id="balance">0</span>$</div>
+
+<div class="stats-panel">
+    <div class="stat-box" id="balance-display">Баланс: <span id="balance">0</span>$</div>
+    <div class="stat-box" id="luck-display">Удача: <span id="luck">1.0</span>x</div>
+</div>
 
 <div class="main-container">
 
     <div class="wheel-section">
         <div class="wheel-box">
-            <div class="pointer"></div>
+            <div class="pointer" id="pointer"></div>
             <canvas id="wheel" width="320" height="320"></canvas>
         </div>
         <button class="spin-btn" id="spin-btn">Крутить колесо</button>
@@ -209,14 +290,34 @@ canvas {
 
     <div class="shop-section">
         <h2>Магазин</h2>
-        <button class="shop-btn" id="buy-luck">Удача (+0.5%) - 4 000$</button>
-        <button class="shop-btn" id="buy-speed">Ускорить вращение - 3 000$</button>
-        <button class="shop-btn" id="buy-10k">Добавить 10 000$ - 10 000$</button>
-        <button class="shop-btn" id="buy-20k">Добавить 20 000$ - 20 000$</button>
-        <button class="shop-btn" id="buy-30k">Добавить 30 000$ - 30 000$</button>
-        <button class="shop-btn" id="buy-40k">Добавить 40 000$ - 40 000$</button>
-        <button class="shop-btn" id="buy-50k">Добавить 50 000$ - 50 000$</button>
-        <button class="shop-btn" id="buy-key" style="background-color: #e67e22;">Ключ от сейфа - 400 000$</button>
+        <button class="shop-btn" id="buy-luck">
+            <span>Удача (+0.5x)</span>
+            <span>4 000$</span>
+        </button>
+        <button class="shop-btn" id="buy-10k">
+            <span>Сектор 10 000$</span>
+            <span>10 000$</span>
+        </button>
+        <button class="shop-btn" id="buy-20k">
+            <span>Сектор 20 000$</span>
+            <span>20 000$</span>
+        </button>
+        <button class="shop-btn" id="buy-30k">
+            <span>Сектор 30 000$</span>
+            <span>30 000$</span>
+        </button>
+        <button class="shop-btn" id="buy-40k">
+            <span>Сектор 40 000$</span>
+            <span>40 000$</span>
+        </button>
+        <button class="shop-btn" id="buy-50k">
+            <span>Сектор 50 000$</span>
+            <span>50 000$</span>
+        </button>
+        <button class="shop-btn key-btn" id="buy-key">
+            <span>Ключ от сейфа</span>
+            <span>400 000$</span>
+        </button>
     </div>
 
     <div class="safe-section">
@@ -234,40 +335,71 @@ canvas {
 
 <script>
 var balance = parseInt(localStorage.getItem('rick_balance')) || 0;
-var luckBoost = parseFloat(localStorage.getItem('rick_luck')) || 0;
-var spinDuration = parseInt(localStorage.getItem('rick_duration')) || 4000;
+var luckMultiplier = parseFloat(localStorage.getItem('rick_luck_mult')) || 1.0;
 var unlockedSectors = JSON.parse(localStorage.getItem('rick_sectors')) || [];
 var isKeyBought = localStorage.getItem('rick_key') === 'true';
 
 var baseSectors = [
-    { label: '100$', val: 100, weight: 100 },
-    { label: '300$', val: 300, weight: 70 },
-    { label: '500$', val: 500, weight: 50 },
-    { label: '700$', val: 700, weight: 35 },
-    { label: '1000$', val: 1000, weight: 20 },
-    { label: '2000$', val: 2000, weight: 10 },
-    { label: '3000$', val: 3000, weight: 5 },
-    { label: '5000$', val: 5000, weight: 2 }
+    { label: '100$', val: 100, baseWeight: 100 },
+    { label: '300$', val: 300, baseWeight: 70 },
+    { label: '500$', val: 500, baseWeight: 50 },
+    { label: '700$', val: 700, baseWeight: 35 },
+    { label: '1000$', val: 1000, baseWeight: 20 },
+    { label: '2000$', val: 2000, baseWeight: 10 },
+    { label: '3000$', val: 3000, baseWeight: 5 },
+    { label: '5000$', val: 5000, baseWeight: 2 }
 ];
 
 var extraSectorsData = {
-    10000: { label: '10 000$', val: 10000, weight: 1.0 },
-    20000: { label: '20 000$', val: 20000, weight: 0.5 },
-    30000: { label: '30 000$', val: 30000, weight: 0.25 },
-    40000: { label: '40 000$', val: 40000, weight: 0.125 },
-    50000: { label: '50 000$', val: 50000, weight: 0.0625 }
+    10000: { label: '10 000$', val: 10000, baseWeight: 1.0 },
+    20000: { label: '20 000$', val: 20000, baseWeight: 0.5 },
+    30000: { label: '30 000$', val: 30000, baseWeight: 0.25 },
+    40000: { label: '40 000$', val: 40000, baseWeight: 0.125 },
+    50000: { label: '50 000$', val: 50000, baseWeight: 0.0625 }
 };
 
 var currentSectors = [];
 var canvas = document.getElementById('wheel');
 var ctx = canvas.getContext('2d');
+var pointerEl = document.getElementById('pointer');
 var isSpinning = false;
 var currentAngle = 0;
+var lastSectorIndex = -1;
+
+var audioCtx = null;
+
+function playTickSound() {
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.04);
+    } catch (e) {}
+}
+
+function triggerPointerKick() {
+    pointerEl.style.transform = 'translateX(-50%) rotate(-18deg)';
+    setTimeout(function() {
+        pointerEl.style.transform = 'translateX(-50%) rotate(0deg)';
+    }, 40);
+}
 
 function saveProgress() {
     localStorage.setItem('rick_balance', balance);
-    localStorage.setItem('rick_luck', luckBoost);
-    localStorage.setItem('rick_duration', spinDuration);
+    localStorage.setItem('rick_luck_mult', luckMultiplier);
     localStorage.setItem('rick_sectors', JSON.stringify(unlockedSectors));
     localStorage.setItem('rick_key', isKeyBought);
 }
@@ -283,10 +415,10 @@ function updateSectorsList() {
 }
 
 function updateUI() {
-    document.getElementById('balance').innerText = balance;
+    document.getElementById('balance').innerText = balance.toLocaleString();
+    document.getElementById('luck').innerText = luckMultiplier.toFixed(1);
     
     document.getElementById('buy-luck').disabled = balance < 4000;
-    document.getElementById('buy-speed').disabled = balance < 3000 || spinDuration <= 1000;
     
     document.getElementById('buy-10k').disabled = balance < 10000 || unlockedSectors.indexOf(10000) !== -1;
     document.getElementById('buy-20k').disabled = balance < 20000 || unlockedSectors.indexOf(20000) !== -1;
@@ -304,7 +436,10 @@ function updateUI() {
 function drawWheel() {
     var num = currentSectors.length;
     var arc = (2 * Math.PI) / num;
-    var colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e84393'];
+    var colors = [
+        '#ff4757', '#ffa502', '#2ed573', '#1e90ff', 
+        '#3742fa', '#9b59b6', '#e84393', '#00d2d3'
+    ];
 
     ctx.clearRect(0, 0, 320, 320);
 
@@ -315,14 +450,18 @@ function drawWheel() {
         ctx.moveTo(160, 160);
         ctx.arc(160, 160, 150, angle, angle + arc);
         ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.stroke();
 
         ctx.save();
         ctx.translate(160, 160);
         ctx.rotate(angle + arc / 2);
         ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 13px Arial";
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0,0,0,0.6)";
+        ctx.shadowBlur = 4;
+        ctx.font = "bold 13px Segoe UI";
         ctx.fillText(currentSectors[i].label, 140, 5);
         ctx.restore();
     }
@@ -333,12 +472,10 @@ function getRandomSectorIndex() {
     var adjustedWeights = [];
 
     for (var i = 0; i < currentSectors.length; i++) {
-        var w = currentSectors[i].weight;
-        if (w < 50) {
-            w = w * (1 + luckBoost);
-        }
-        adjustedWeights.push(w);
-        totalWeight += w;
+        var baseW = currentSectors[i].baseWeight;
+        var finalWeight = Math.pow(baseW, 1 / luckMultiplier);
+        adjustedWeights.push(finalWeight);
+        totalWeight += finalWeight;
     }
 
     var randomNum = Math.random() * totalWeight;
@@ -351,6 +488,23 @@ function getRandomSectorIndex() {
         }
     }
     return 0;
+}
+
+function checkSectorCollision() {
+    var num = currentSectors.length;
+    var arc = (2 * Math.PI) / num;
+    var normalizedAngle = ((3 * Math.PI / 2) - currentAngle) % (2 * Math.PI);
+    if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+
+    var activeSector = Math.floor(normalizedAngle / arc) % num;
+
+    if (activeSector !== lastSectorIndex) {
+        if (lastSectorIndex !== -1) {
+            playTickSound();
+            triggerPointerKick();
+        }
+        lastSectorIndex = activeSector;
+    }
 }
 
 function spin() {
@@ -370,6 +524,7 @@ function spin() {
 
     var startTime = null;
     var startAngle = currentAngle;
+    var spinDuration = 4000;
 
     function animateSpin(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -379,10 +534,12 @@ function spin() {
             var easeOut = 1 - Math.pow(1 - progress, 3);
             currentAngle = startAngle + (finalAngle - startAngle) * easeOut;
             drawWheel();
+            checkSectorCollision();
             requestAnimationFrame(animateSpin);
         } else {
             currentAngle = finalAngle;
             drawWheel();
+            checkSectorCollision();
             isSpinning = false;
             document.getElementById('spin-btn').disabled = false;
 
@@ -401,16 +558,7 @@ document.getElementById('spin-btn').addEventListener('click', spin);
 document.getElementById('buy-luck').addEventListener('click', function() {
     if (balance >= 4000) {
         balance -= 4000;
-        luckBoost += 0.5;
-        updateUI();
-        saveProgress();
-    }
-});
-
-document.getElementById('buy-speed').addEventListener('click', function() {
-    if (balance >= 3000 && spinDuration > 1000) {
-        balance -= 3000;
-        spinDuration = 1000;
+        luckMultiplier += 0.5;
         updateUI();
         saveProgress();
     }
