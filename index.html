@@ -81,10 +81,10 @@ h1 {
     position: relative;
     width: 340px;
     height: 340px;
-    padding: 10px;
-    background: radial-gradient(circle, #2c3e50, #000000);
+    padding: 12px;
+    background: radial-gradient(circle, #f1c40f, #e67e22, #2c3e50, #111116);
     border-radius: 50%;
-    box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.2);
+    box-shadow: 0 0 35px rgba(241, 196, 15, 0.3), 0 0 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.4);
 }
 
 .pointer {
@@ -160,7 +160,7 @@ canvas {
     padding: 14px 16px;
     font-size: 14px;
     font-weight: 600;
-    color: #fff;
+    color: #ffffff;
     background: linear-gradient(135deg, #2ed573, #26af5f);
     border: none;
     border-radius: 10px;
@@ -173,6 +173,11 @@ canvas {
     align-items: center;
 }
 
+.shop-btn span {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
 .shop-btn:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(46, 213, 115, 0.4);
@@ -180,15 +185,24 @@ canvas {
 
 .shop-btn:disabled {
     background: #333;
-    color: #666;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
 
+.shop-btn:disabled span {
+    color: #888888;
+    text-shadow: none;
+}
+
 .shop-btn.key-btn {
     background: linear-gradient(135deg, #ffa502, #ff7f50);
     box-shadow: 0 4px 12px rgba(255, 165, 2, 0.3);
+}
+
+.shop-btn.key-btn span {
+    color: #ffffff;
+    font-weight: bold;
 }
 
 .shop-btn.key-btn:hover:not(:disabled) {
@@ -368,25 +382,49 @@ var lastSectorIndex = -1;
 
 var audioCtx = null;
 
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
 function playTickSound() {
     try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        initAudio();
         var osc = audioCtx.createOscillator();
         var gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(600, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.04);
+    } catch (e) {}
+}
+
+function playWinSound() {
+    try {
+        initAudio();
+        var notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach(function(freq, index) {
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            var startTime = audioCtx.currentTime + index * 0.1;
+            gain.gain.setValueAtTime(0.2, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.3);
+        });
     } catch (e) {}
 }
 
@@ -445,13 +483,19 @@ function drawWheel() {
 
     for (var i = 0; i < num; i++) {
         var angle = currentAngle + i * arc;
+        
+        var gradient = ctx.createRadialGradient(160, 160, 20, 160, 160, 150);
+        gradient.addColorStop(0, colors[i % colors.length]);
+        gradient.addColorStop(1, '#111');
+
         ctx.beginPath();
-        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillStyle = gradient;
         ctx.moveTo(160, 160);
         ctx.arc(160, 160, 150, angle, angle + arc);
         ctx.fill();
+
         ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.stroke();
 
         ctx.save();
@@ -459,12 +503,23 @@ function drawWheel() {
         ctx.rotate(angle + arc / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0,0,0,0.6)";
-        ctx.shadowBlur = 4;
+        ctx.shadowColor = "#000000";
+        ctx.shadowBlur = 5;
         ctx.font = "bold 13px Segoe UI";
         ctx.fillText(currentSectors[i].label, 140, 5);
         ctx.restore();
     }
+
+    ctx.beginPath();
+    ctx.arc(160, 160, 25, 0, 2 * Math.PI);
+    var centerGrad = ctx.createRadialGradient(160, 160, 5, 160, 160, 25);
+    centerGrad.addColorStop(0, '#ffffff');
+    centerGrad.addColorStop(1, '#2c3e50');
+    ctx.fillStyle = centerGrad;
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#f1c40f';
+    ctx.stroke();
 }
 
 function getRandomSectorIndex() {
@@ -519,19 +574,19 @@ function spin() {
     var targetAngleOnWheel = (3 * Math.PI / 2) - (targetIndex * arc + arc / 2);
     targetAngleOnWheel = (targetAngleOnWheel % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
-    var extraRounds = 5 * 2 * Math.PI;
+    var extraRounds = 8 * 2 * Math.PI;
     var finalAngle = currentAngle + extraRounds + (targetAngleOnWheel - (currentAngle % (2 * Math.PI)));
 
     var startTime = null;
     var startAngle = currentAngle;
-    var spinDuration = 4000;
+    var spinDuration = 5500;
 
     function animateSpin(timestamp) {
         if (!startTime) startTime = timestamp;
         var progress = (timestamp - startTime) / spinDuration;
 
         if (progress < 1) {
-            var easeOut = 1 - Math.pow(1 - progress, 3);
+            var easeOut = 1 - Math.pow(1 - progress, 4);
             currentAngle = startAngle + (finalAngle - startAngle) * easeOut;
             drawWheel();
             checkSectorCollision();
@@ -545,6 +600,11 @@ function spin() {
 
             var wonAmount = currentSectors[targetIndex].val;
             balance += wonAmount;
+            
+            if (wonAmount >= 10000) {
+                playWinSound();
+            }
+
             updateUI();
             saveProgress();
         }
